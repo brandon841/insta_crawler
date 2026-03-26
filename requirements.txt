@@ -1,0 +1,6 @@
+apify_client
+networkx
+pandas
+google-cloud-bigquery
+google-cloud-storage
+python-dotenv

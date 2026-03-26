@@ -42,12 +42,12 @@ def _upsert_node(G: nx.DiGraph, item: dict, depth: int):
         return
     G.add_node(
         username,
-        pk          = item.get("pk") or item.get("id", ""),
-        full_name   = item.get("full_name", ""),
-        is_private  = item.get("is_private", False),
+        pk = item.get("pk") or item.get("id", ""),
+        full_name = item.get("full_name", ""),
+        is_private = item.get("is_private", False),
         is_verified = item.get("is_verified", False),
         profile_pic = item.get("profile_pic_url", ""),
-        depth       = depth,
+        depth = depth
     )
 
 
@@ -57,12 +57,14 @@ def add_following_to_graph(G: nx.DiGraph, items: list[dict], depth: int):
     `followed_by` = seed username  →  edge: seed → item.username
     """
     for item in items:
-        seed     = item.get("followed_by")
+        seed = item.get("followed_by")
         username = item.get("username")
         if not seed or not username:
             continue
         if seed not in G:
             G.add_node(seed, depth=depth)
+            
+        #adding user node with all medata
         _upsert_node(G, item, depth)
         G.add_edge(seed, username, relationship="follows", depth=depth)
 
@@ -73,7 +75,7 @@ def add_followers_to_graph(G: nx.DiGraph, items: list[dict], depth: int):
     `followed_to` = seed username  →  edge: item.username → seed
     """
     for item in items:
-        seed     = item.get("followed_to")
+        seed = item.get("followed_to")
         username = item.get("username")
         if not seed or not username:
             continue

@@ -16,8 +16,7 @@ BQ_NODES_TABLE  = f"{GCP_PROJECT}.{BQ_DATASET}.nodes"
 BQ_EDGES_TABLE  = f"{GCP_PROJECT}.{BQ_DATASET}.edges"
 GCS_BUCKET      = os.environ["GCS_BUCKET_NAME"]
 
-FOLLOWER_THRESHOLD  = 1_000  # min in-graph followers to qualify for depth-2 crawl
-MAX_DEPTH2_ACCOUNTS = 50     # max accounts to crawl at depth 2
+MAX_DEPTH2_ACCOUNTS = 0     # max accounts to crawl at depth 2
 
 
 # ── 1. Deduplication tracker ───────────────────────────────────────────────────
@@ -96,7 +95,7 @@ def run_bfs_crawl(seed_accounts: list[str]) -> nx.DiGraph:
 
 # ── 4. Store to BigQuery ───────────────────────────────────────────────────────
 def store_to_bigquery(G: nx.DiGraph):
-    bq    = bigquery.Client(project=GCP_PROJECT)
+    bq = bigquery.Client(project=GCP_PROJECT)
     nodes = [{"username": n, **d} for n, d in G.nodes(data=True)]
     edges = [{"source": u, "target": v, **d} for u, v, d in G.edges(data=True)]
 
