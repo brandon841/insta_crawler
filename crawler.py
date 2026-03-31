@@ -1,10 +1,14 @@
 import os
 import networkx as nx
 from apify_client import ApifyClient
+from dotenv import load_dotenv
+
+load_dotenv()
 
 APIFY_TOKEN        = os.environ["APIFY_API_TOKEN"]
 FOLLOWING_ACTOR_ID = "louisdeconinck/instagram-following-scraper"
 FOLLOWER_ACTOR_ID  = "louisdeconinck/instagram-followers-scraper"
+PROFILE_ACTOR_ID   = "apify/instagram-profile-scraper"
 
 
 # ── 1. Apify fetch ─────────────────────────────────────────────────────────────
@@ -33,6 +37,18 @@ def fetch_followers(usernames: list[str]) -> list[dict]:
     )
     return list(apify.dataset(run["defaultDatasetId"]).iterate_items())
 
+def fetch_profiles(usernames: list[str]) -> list[dict]:
+    """
+    For each username, return their profile information.
+    Each result item contains `username` and profile metadata.
+    No edges returned from this actor, just node attributes.
+    """
+    apify = ApifyClient(APIFY_TOKEN)
+    run   = apify.actor(PROFILE_ACTOR_ID).call(
+        run_input={"usernames": usernames}
+    )
+    return list(apify.dataset(run["defaultDatasetId"]).iterate_items())
+
 
 # ── 2. Graph builder ───────────────────────────────────────────────────────────
 def _upsert_node(G: nx.DiGraph, item: dict, depth: int):
@@ -47,6 +63,7 @@ def _upsert_node(G: nx.DiGraph, item: dict, depth: int):
         is_private = item.get("is_private", False),
         is_verified = item.get("is_verified", False),
         profile_pic = item.get("profile_pic_url", ""),
+        latest_reel_media = item.get("latest_reel_media", ""),
         depth = depth
     )
 
