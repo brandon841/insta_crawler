@@ -7,7 +7,8 @@ load_dotenv()
 
 APIFY_TOKEN        = os.environ["APIFY_API_TOKEN"]
 FOLLOWING_ACTOR_ID = "louisdeconinck/instagram-following-scraper"
-FOLLOWER_ACTOR_ID  = "louisdeconinck/instagram-followers-scraper"
+# FOLLOWER_ACTOR_ID  = "louisdeconinck/instagram-followers-scraper"
+FOLLOWER_ACTOR_ID = 'datavoyantlab/instagram-followers-scraper'
 PROFILE_ACTOR_ID   = "apify/instagram-profile-scraper"
 
 

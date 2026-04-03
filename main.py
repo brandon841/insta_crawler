@@ -73,7 +73,7 @@ def run_bfs_crawl(seed_accounts: list[str]) -> nx.DiGraph:
         add_followers_to_graph(G, followers, depth=1)
 
         state.mark_fetched(username)
-        print(f"  {username}: {len(following)} following, {len(followers)} followers — "
+        print(f"  {username}: {len(followers)} followers — "
               f"graph now {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
         time.sleep(2)
 
@@ -178,12 +178,17 @@ def store_to_bigquery(G: nx.DiGraph):
     nodes = [{"username": n, **d} for n, d in G.nodes(data=True)]
     edges = [{"source": u, "target": v, **d} for u, v, d in G.edges(data=True)]
 
+    new_nodes = pd.DataFrame(nodes)
+    new_edges = pd.DataFrame(edges)
+
     if nodes:
         bq.insert_rows_json(BQ_NODES_TABLE, nodes)
         print(f"Stored {len(nodes)} nodes to BigQuery")
     if edges:
         bq.insert_rows_json(BQ_EDGES_TABLE, edges)
         print(f"Stored {len(edges)} edges to BigQuery")
+    
+    return new_nodes, new_edges
 
 # ── 6. Entry point ─────────────────────────────────────────────────────────────
 def main():
@@ -206,7 +211,7 @@ def main():
     print(f"Saved nodes and edges as parquet files locally")
 
     #saving to biquery dataset
-    store_to_bigquery(G)
+    new_nodes, new_edges = store_to_bigquery(G)
 
     print("\n── Graph analysis ──────────────────────────────────────────")
     centrality = nx.degree_centrality(G)
